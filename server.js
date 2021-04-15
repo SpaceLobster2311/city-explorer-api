@@ -1,6 +1,7 @@
 'use strict';
 // const { response } = require('express');
 const express = require('express');
+
 require('dotenv').config();
 const cors = require('cors');
 const weatherData = require('./data/weather.json');
