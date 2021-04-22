@@ -48,10 +48,31 @@ function Forecast(day){
   this.date = day.datetime;
   this.description = day.weather.description;
 }
-
+function Movie(film){
+  this.title = film.title;
+  this.overview = film.overview;
+}
 function errorHandling(error, response){
   response.status(500).send('internal server error');
 }
+
+
+app.get('/movies', (request, response)=> {
+  superagent.get('https://api.themoviedb.org/3/search/movie')
+  .query({
+    api_key: process.env.REACT_APP_MOVIE_KEY,
+    query: request.query.movie,
+  })
+  .then(movieData => {
+    response.status(200).json(movieData.body.results.map(film => (
+      new Movie(film)
+    )))
+    .catch(err=>{
+      console.log(err);
+    })
+  })
+})
+
 
 app.listen(PORT, () => console.log(`app is listening on port ${PORT}`));
 
