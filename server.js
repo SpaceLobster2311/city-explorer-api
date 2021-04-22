@@ -1,6 +1,7 @@
 'use strict';
 // const { response } = require('express');
 const express = require('express');
+const superagent = require('superagent');
 
 require('dotenv').config();
 const cors = require('cors');
@@ -10,15 +11,37 @@ app.use(cors());
 
 const PORT = process.env.PORT || 3001;
 
+// proof of life of super agent
 
+app.get('/weather',(request, response)=> {
+  
+  superagent.get('https://api.weatherbit.io/v2.0/forecast/daily')
+  // .query lets up break up the query params using an object instead of a string.
+  .query({
+    key : process.env.REACT_APP_WEATHER_APP_KEY,
+    units : 'I',
+    lat : request.query.lat,
+    lon : request.query.lon
+  })
+    .then(weatherData =>{
+      response.status(200).json(weatherData.body.data.map(day => (
+        new Forecast(day))))
 
-  app.get('/weather',(request, response)=> {
-    try{
-    const dailyForecasts = weatherData.data.map(day => new Forecast(day));
-    response.json(dailyForecasts);
-  } catch (error) {
-    errorHandling(error, response);
-  }
+        
+        // {date: day.valid_date,
+        //  description: day.weather.description})));
+        //  response.json(weatherData);
+      })
+    .catch(err=>{
+      console.log(err);
+    })
+
+    //   try{
+  //   const dailyForecasts = weatherData.data.map(day => new Forecast(day));
+  //   response.json(dailyForecasts);
+  // } catch (error) {
+  //   errorHandling(error, response);
+  // }
   });
 
 function Forecast(day){
